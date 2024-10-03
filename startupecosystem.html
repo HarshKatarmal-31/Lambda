@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Start-up Ecosystem Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Use jsDelivr for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-patterns/dist/chartjs-plugin-patterns.min.js"></script> <!-- Include patterns plugin -->
+
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #0056b3, #007bff);
+            color: #fff;
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #f4b400;
+            transform: scale(1.1);
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Overview Section */
+        .overview h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #007bff;
+        }
+
+        .cards {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: #0056b3;
+            color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            flex: 1 1 200px;
+            margin: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Start-up Status Section */
+        .startups {
+            margin-bottom: 40px;
+        }
+
+        .startups h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #007bff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        th {
+            background-color: #0056b3;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Metrics Section */
+        .metrics {
+            margin-bottom: 40px;
+        }
+
+        .metrics h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #007bff;
+        }
+
+        .charts {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 0 -10px; /* Allow for negative margin */
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 500px;
+            height: 400px; /* Fixed height */
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            transition: transform 0.3s;
+        }
+
+        .chart-container:hover {
+            transform: scale(1.03);
+        }
+
+        /* Upcoming Events Section */
+        .events {
+            margin-bottom: 40px;
+        }
+
+        .events h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #007bff;
+        }
+
+        .events ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .events li {
+            background: #f4f4f4;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 5px solid #0056b3;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .events li:hover {
+            background: #e9ecef;
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background: #0056b3;
+            color: #fff;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .charts {
+                flex-direction: column; /* Stack charts vertically on smaller screens */
+                align-items: center; /* Center align items */
+            }
+
+            .chart-container {
+                width: 100%; /* Full width on mobile */
+                height: 250px; /* Adjust height for mobile */
+            }
+
+            .cards {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Start-up Ecosystem Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#startups">Start-up Status</a></li>
+                <li><a href="#metrics">Key Metrics</a></li>
+                <li><a href="#events">Upcoming Events</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Overview Section -->
+        <section id="overview" class="overview">
+            <h2>Overview</h2>
+            <div class="cards">
+                <a href="total-startups-details.html" class="card"> <!-- Link to details of total startups -->
+                    <h3>Total Start-ups Registered</h3>
+                    <p id="total-startups">540</p>
+                </a>
+                <a href="funding-details.html" class="card"> <!-- Link to funding details -->
+                    <h3>Total Funding Received</h3>
+                    <p id="total-funding">$3,200,000</p>
+                </a>
+                <a href="successful-exits.html" class="card"> <!-- Link to successful exits -->
+                    <h3>Successful Exits</h3>
+                    <p id="successful-exits">15</p>
+                </a>
+                <a href="active-startups.html" class="card"> <!-- Link to active startups -->
+                    <h3>Active Start-ups</h3>
+                    <p id="active-startups">450</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Start-up Status Section -->
+        <section id="startups" class="startups">
+            <h2>Recent Start-up Filings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Start-up Name</th>
+                        <th>Status</th>
+                        <th>Funding Stage</th>
+                        <th>Founded Date</th>
+                        <th>Founder</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr onclick="window.location.href='healthtech-innovations.html'">
+                        <td>HealthTech Innovations</td>
+                        <td>Active</td>
+                        <td>Series A</td>
+                        <td>15 Jan 2022</td>
+                        <td>Alice Johnson</td>
+                    </tr>
+                    <tr onclick="window.location.href='green-energy-solutions.html'">
+                        <td>Green Energy Solutions</td>
+                        <td>Active</td>
+                        <td>Seed</td>
+                        <td>22 Feb 2023</td>
+                        <td>Bob Smith</td>
+                    </tr>
+                    <tr onclick="window.location.href='agritech-ventures.html'">
+                        <td>Agritech Ventures</td>
+                        <td>Inactive</td>
+                        <td>Series B</td>
+                        <td>10 Mar 2021</td>
+                        <td>Carol Lee</td>
+                    </tr>
+                    <tr onclick="window.location.href='fintech-revolution.html'">
+                        <td>Fintech Revolution</td>
+                        <td>Successful Exit</td>
+                        <td>NA</td>
+                        <td>5 Apr 2020</td>
+                        <td>David Kim</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Key Metrics Section -->
+        <section id="metrics" class="metrics">
+            <h2>Key Metrics</h2>
+            <div class="charts">
+                <div class="chart-container">
+                    <canvas id="startupMetricsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="startupFundingChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upcoming Events Section -->
+        <section id="events" class="events">
+            <h2>Upcoming Events</h2>
+            <ul>
+                <li><a href="startup-expo.html"><strong>Start-up Expo 2024:</strong></a> A platform to showcase innovations - <span>January 15, 2024</span></li>
+                <li><a href="funding-workshop.html"><strong>Funding Workshop:</strong></a> How to attract investors - <span>February 10, 2024</span></li>
+                <li><a href="networking-event.html"><strong>Networking Event:</strong></a> Connect with industry leaders - <span>March 5, 2024</span></li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Gujarat State Council of Innovation. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Wait for the DOM to be fully loaded before initializing charts
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Line chart for Start-up status metrics
+            const ctxLine = document.getElementById('startupMetricsChart').getContext('2d');
+            const startupMetricsChart = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Active Start-ups',
+                        data: [400, 420, 430, 440, 450, 460],
+                        fill: true,
+                        backgroundColor: 'rgba(52, 168, 83, 0.4)',
+                        borderColor: '#34a853',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Inactive Start-ups',
+                        data: [80, 75, 70, 65, 60, 55],
+                        fill: true,
+                        backgroundColor: 'rgba(255, 76, 76, 0.4)',
+                        borderColor: '#ff4c4c',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Doughnut chart for funding distribution
+            const ctxDoughnut = document.getElementById('startupFundingChart').getContext('2d');
+            const startupFundingChart = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Seed', 'Series A', 'Series B', 'Others'],
+                    datasets: [{
+                        label: 'Funding Distribution',
+                        data: [2000000, 1200000, 800000, 200000], // Sample data for funding
+                        backgroundColor: [
+                            '#ff6384', // Seed funding
+                            '#36a2eb', // Series A
+                            '#4bc0c0', // Series B
+                            '#ffce56'  // Others
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': $' + tooltipItem.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
